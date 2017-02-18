@@ -280,3 +280,82 @@ Explanation video:
 *注：*
 
 Set是<ListNode>存储的！
+
+**21. Merge Two Sorted Lists**
+
+*Top Solution:*
+
+	public class Solution {
+    public ListNode mergeTwoLists(ListNode l1, ListNode l2) {
+        if(l1 == null){
+            return l2;
+        }
+        if(l2 == null){
+            return l1;
+        }//The ending part
+        
+        ListNode mergeHead;//Head是reference value，所以recursively返回head的时候，head是new的。
+        if(l1.val < l2.val){
+            mergeHead = l1;
+            mergeHead.next = mergeTwoLists(l1.next, l2);
+        }
+        else{
+            mergeHead = l2;
+            mergeHead.next = mergeTwoLists(l1, l2.next);
+        }
+        return mergeHead;//最后溯源到第一个head的时候，它实际已经被串成了merge好的list.
+    }
+	}
+
+**24. Swap Nodes in Pairs**
+
+*注：*
+
+	while(cur!=null){
+            if(cur.next==null) break;
+            ListNode temp = cur;
+            cur = cur.next;
+            cur.next = temp;
+            cur = cur.next;
+     }
+这是完全不正确的swap方式！因为要考虑cur之前的对象要指向cur
+
+*Top Solution:*
+
+    public class Solution {
+    public ListNode swapPairs(ListNode head) {
+        ListNode all = new ListNode(0);
+        all.next = head;
+        ListNode cur = all;
+		//cur的位置在需要swap的两个数前，这样能保证有三个已知数，cur; cur.next; cur.next.next。 这个方法速度快很多
+        while(cur.next!=null&&cur.next.next!=null){
+            ListNode temp = cur.next.next;
+            cur.next.next = temp.next;
+            temp.next = cur.next;
+            cur.next = temp;
+            cur = cur.next.next;
+        }
+        return all.next;
+    }
+	}
+
+*Another Solution:*
+
+    public class Solution {
+    public ListNode swapPairs(ListNode head) {
+        ListNode all = new ListNode(0);
+        all.next = head;
+        ListNode cur = all.next;//current pointer
+        ListNode pre = all;
+		//用了pre和cur，循环记录pre
+        while(cur!=null&&cur.next!=null){
+            ListNode temp = cur.next;
+            cur.next = temp.next;
+            temp.next = cur;
+            pre.next = temp;
+            pre = cur;
+            cur = cur.next;
+        }
+        return all.next;
+    }
+	}
