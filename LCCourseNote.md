@@ -359,3 +359,227 @@ Set是<ListNode>存储的！
         return all.next;
     }
 	}
+	
+	
+### Chapter 3. Binary Tree ###
+
+**104. Maximum Depth of Binary Tree**
+
+*Clear Code:*
+
+    /**
+	 * Definition for a binary tree node.
+	 * public class TreeNode {
+	 *     int val;
+	 *     TreeNode left;
+	 *     TreeNode right;
+	 *     TreeNode(int x) { val = x; }
+	 * }
+	 */
+	public class Solution {
+    public int maxDepth(TreeNode root) {
+        if(root==null){
+            return 0;
+        }
+        return Math.max(maxDepth(root.left),maxDepth(root.right))+1;
+    }
+	}
+
+**100. Same Tree**
+
+*Top Solution:*
+
+    public class Solution {
+    public boolean isSameTree(TreeNode p, TreeNode q) {
+        
+        if(p==null&&q==null) return true;
+        if(p==null||q==null) return false;
+        
+        return isSameTree(p.left, q.left)&&isSameTree(p.right, q.right)&&(p.val==q.val);
+    }
+	}
+
+*注：*
+    public boolean isSameTree(TreeNode p, TreeNode q) {
+    if(p!=null){
+        if(q!=null&&p.val==q.val){
+            isSameTree(p.left, q.left);
+            isSameTree(p.right, q.right);
+        }
+        else return false;
+    }else{
+        if(q!=null) return false;
+    }
+    return true;
+	}
+
+这种方式不正确，因为没有考虑return值，所有声明了有return的数必须要有return值。
+
+**112. Path Sum**
+
+The basic idea is to subtract the value of current node from sum until it reaches a leaf node and the subtraction equals 0, then we know that we got a hit. Otherwise the subtraction at the end could not be 0.
+
+    public class Solution {
+    public boolean hasPathSum(TreeNode root, int sum) {
+        if(root == null) return false;
+    
+        if(root.left == null && root.right == null && sum - root.val == 0) return true;
+    
+        return hasPathSum(root.left, sum - root.val) || hasPathSum(root.right, sum - root.val);
+    }
+	}
+
+*注：*  
+1. return hasPathSum(root.left, sum - root.val) || hasPathSum(root.right, sum - root.val); 非常基础的开枝散叶的找到所有path的方法！！！
+2. Use the subtraction can avoid using another value to store the sum of each node.
+
+**257. Binary Tree Path**
+
+*Top Solution:*
+
+    public class Solution {
+    public List<String> binaryTreePaths(TreeNode root) {
+        List<String> answer = new ArrayList<String>();
+        if(root!=null){
+            BT(root, answer, "");
+	//注意！It's hard to make the binaryTreePaths class as a recursive method, so we provide another new class!
+        }
+        return answer;
+        
+    }
+	//注意！ 这是another基础的遍历整个树的方法
+    //注意！将answer和path都作为variable是因为，如果path是local 
+	//variable，则会每次调用时被更新，answer也是如此
+    public void BT(TreeNode root, List<String> answer, String path){
+        if(root.left==null&&root.right==null) {
+            path = path+root.val; 
+            answer.add(path);
+        }
+	//当左边分叉到了leaf，回到这下面一条语句后，继续执行下一个
+	//判断右边分叉有没有leaf的语句。
+        if(root.left!=null) {
+	//注意！这里不用path=path+root.val+"->" 再将path当作变量传入
+	//因为这里的path储存了root之前的path，这样才能回到这个语句时，
+	//path是“root的root”的path。
+            BT(root.left, answer, path+root.val+"->");
+        }
+        if(root.right!=null){
+            BT(root.right, answer, path+root.val+"->");
+        }
+    }
+	}
+
+*Improved Top Solution:*
+
+Use StringBuilder, We can just keep track of the length of the StringBuilder before we append anything to it before recursion and afterwards set the length back. Another trick is when to append the "->", since we don't need the last arrow at the end of the string, we only append it before recurse to the next level of the tree.
+
+    public class Solution {
+    public List<String> binaryTreePaths(TreeNode root) {
+        List<String> answer = new ArrayList<String>();
+        StringBuilder sb = new StringBuilder();
+        if(root!=null){
+            BT(root, answer, sb);
+        }
+        return answer;
+        
+    }
+    public void BT(TreeNode root, List<String> answer, StringBuilder sb){
+        if(root == null) {
+            return;
+        }
+		//由于无法像上一个方法一样直接用path+...作为参数，
+		//只有记录root的root的path长度，在每次遍历完一个root的时候，
+		//将sb设为该长度。
+        int len = sb.length();
+        sb.append(root.val);
+        if(root.left==null&&root.right==null) {
+            answer.add(sb.toString());
+        }else{
+            sb.append("->");
+            BT(root.left, answer, sb);
+            BT(root.right, answer, sb);
+        }
+        sb.setLength(len);
+    }
+	}
+
+**98. Validate Binary Search Tree**
+
+*Top Solution:*
+
+    public class Solution {
+    public boolean isValidBST(TreeNode root) {
+        return isValid(root, null, null);//注意！这里的null其实更像一个flag，
+		//用于记录与root.val相比较的是root.left还是root.right! So clever!!
+    }
+    public boolean isValid(TreeNode root, Integer min, Integer max){
+        if(root==null) return true;
+		//因此是从root往下判断是否是bst
+        if(max!=null&&root.val>=max) return false;//注意！是要用max!=null，因为max一开始的赋值就是null
+        if(min!=null&&root.val<=min) return false;
+        return isValid(root.left, min, root.val)&&isValid(root.right, root.val, max);
+		//为什么不能用null来代替min或者max？？
+    }
+	}
+
+### Chapter 4. STACK AND QUEUE ###
+
+Stack继承自Vector,拓展出五个操作；
+Queue接口与List、Set同一级别，都是继承了Collection接口。LinkedList实现了Queue接口。Queue接口窄化了对LinkedList的方法的访问权限
+
+**225. Implement Stack Using Queues**
+
+*Solution 1: Use another queue*
+
+    public class MyStack {
+
+    private Queue<Integer> q = new LinkedList<>();
+    private Queue<Integer> t = new LinkedList<>();
+    private int top;
+    /** Initialize your data structure here. */
+    public MyStack() {
+        
+    }
+    
+    /** Push element x onto stack. */
+    public void push(int x) {
+        q.add(x);
+        top = x;
+    }
+    
+    /** Removes the element on top of the stack and returns that element. */
+    public int pop() {
+        while(q.size()>1){ //why can't use: for(int i=0; i<q.size()-1; i++)
+            top = q.remove();
+            t.add(top);
+        }
+        int temp = q.remove();
+        while(t.size()>0){
+            q.add(t.remove());
+        }
+        return temp;
+    }
+    
+    /** Get the top element. */
+    public int top() {
+        return top;
+    }
+    
+    /** Returns whether the stack is empty. */
+    public boolean empty() {
+        return q.isEmpty();
+    }
+	}
+
+	/**
+	 * Your MyStack object will be instantiated and called as such:
+	 * MyStack obj = new MyStack();
+	 * obj.push(x);
+	 * int param_2 = obj.pop();
+	 * int param_3 = obj.top();
+	 * boolean param_4 = obj.empty();
+	 */
+
+*Solution 2:*
+
+[https://leetcode.com/articles/implement-stack-using-queues/](https://leetcode.com/articles/implement-stack-using-queues/)
