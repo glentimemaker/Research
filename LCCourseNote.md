@@ -583,3 +583,94 @@ Queue接口与List、Set同一级别，都是继承了Collection接口。LinkedL
 *Solution 2:*
 
 [https://leetcode.com/articles/implement-stack-using-queues/](https://leetcode.com/articles/implement-stack-using-queues/)
+
+**20. Valid Parentheses**
+
+*Top Solution:*
+
+    public class Solution {
+    public boolean isValid(String s) {
+        Stack<Character> stack = new Stack<>();
+        for(char c:s.toCharArray()){
+            if(c=='(') stack.push(')');
+            else if(c=='{') stack.push('}');
+            else if(c=='[') stack.push(']');
+            else if(stack.isEmpty()||stack.pop()!=c) return false;
+        }
+        return stack.isEmpty();//与上面一个isEmpty一起检查是否对称
+    }
+	}
+
+可以实行的本质原因是因为最基础的元素必须是左右两个括号相邻。
+
+**232. Implement Queue using Stack**
+
+*My Solution:*
+
+    public class MyQueue {
+
+    Stack<Integer> s1 = new Stack<>();
+    Stack<Integer> s2 = new Stack<>();
+    Integer top = null;
+    /** Initialize your data structure here. */
+    public MyQueue() {
+        
+    }
+    
+    /** Push element x to the back of queue. */
+    public void push(int x) {
+        if(top==null) top = x;
+        s1.push(x);
+    }
+    
+    /** Removes the element from in front of queue and returns that element. */
+    public int pop() {
+        while(s1.size()>1){
+            s2.push(s1.pop());
+        }
+        int pop = s1.pop();
+        
+        if(s2.isEmpty()) top = null;
+        else top = s1.push(s2.pop());
+        while(s2.size()>0){
+            s1.push(s2.pop());
+        }
+        
+        return pop;
+    }
+    
+    /** Get the front element. */
+    public int peek() {
+        return top;
+    }
+    
+    /** Returns whether the queue is empty. */
+    public boolean empty() {
+        return s1.isEmpty();
+    }
+	}
+
+**102. Binary Tree Level Order Traversal**
+
+    public class Solution {
+    public List<List<Integer>> levelOrder(TreeNode root) {
+        
+        List<List<Integer>> order = new LinkedList<List<Integer>>();
+        Queue<TreeNode> queue = new LinkedList<>();
+        if(root==null) return order;
+        queue.add(root);
+        while(!queue.isEmpty()){
+            int size = queue.size();
+            List<Integer> level = new LinkedList<>();
+            for(int i=0; i<size; i++){
+                TreeNode temp = queue.peek();
+                if(temp.left!=null) queue.add(temp.left);
+                if(temp.right!=null) queue.add(temp.right);
+                level.add(queue.poll().val);
+            }
+            order.add(level);
+        }
+        return order;
+	}
+	}
+*注意！* List和Queue一样都是要实例化！！
