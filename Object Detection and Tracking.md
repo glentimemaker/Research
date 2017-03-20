@@ -1,4 +1,5 @@
 ##Part I: Basic Method##
+
 “Histograms of Oriented Gradients for Human Detection,” N. Dalal and W. Triggs, Proc. IEEE CVPR 2005.
 
 Improvement: 
